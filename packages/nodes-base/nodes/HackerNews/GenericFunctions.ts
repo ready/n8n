@@ -40,7 +40,7 @@ export async function hackerNewsApiRequest(this: IHookFunctions | IExecuteFuncti
 			message: ['error', 'error'],
 		};
 
-		throw new NodeApiError('Hacker News', error, { path });
+		throw new NodeApiError('Hacker News', error);
 	}
 }
 

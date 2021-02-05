@@ -56,7 +56,7 @@ export async function spotifyApiRequest(this: IHookFunctions | IExecuteFunctions
 			message: ['error', 'error', 'message'],
 		};
 
-		throw new NodeApiError('Spotify', error, { path });
+		throw new NodeApiError('Spotify', error);
 	}
 }
 

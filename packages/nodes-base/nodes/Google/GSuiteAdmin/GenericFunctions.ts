@@ -41,7 +41,7 @@ export async function googleApiRequest(this: IExecuteFunctions | IExecuteSingleF
 			message: ['error', 'error', 'message'],
 		};
 
-		throw new NodeApiError('GSuite Admin', error, { path });
+		throw new NodeApiError('GSuite Admin', error);
 	}
 }
 
