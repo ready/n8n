@@ -34,6 +34,7 @@ export interface IExecutionError {
 	message: string;
 	node?: string;
 	stack?: string;
+	description?: string;
 }
 
 // Get used to gives nodes access to credentials
