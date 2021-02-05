@@ -3,28 +3,37 @@ import {
 } from 'lodash';
 
 abstract class NodeError extends Error {
-	traceHeader: string | null = null;
+	description: string | null = null;
 	cause: Error | JsonObject;
 	timestamp: number;
 	nodeType: string;
+	descriptionIsArray = false;
 
 	constructor(
 		name: string,
 		nodeType: string,
 		error: Error | JsonObject,
+		descriptionIsArray = false,
 	) {
 		super(name);
 		this.cause = error;
 		this.nodeType = nodeType;
 		this.timestamp = new Date().getTime();
+		this.descriptionIsArray = descriptionIsArray;
 	}
 
-	protected findProperty(
+	protected findValueRecursively(
 		error: JsonObject,
-		{ target }: { target: 'httpCode' | 'traceHeader' },
+		{ targetProperty }: { targetProperty: 'httpCode' | 'description' },
 	): string | null {
 
-		const topLevelKeys = target === 'httpCode'
+		if (targetProperty === 'description' && this.descriptionIsArray) {
+			const container = error as ErrorObjectsContainer;
+			const errorObjects = container.response.body.error.errors;
+			return errorObjects.map((error) => error.message).join('|');
+		}
+
+		const topLevelKeys = targetProperty === 'httpCode'
 			? ERROR_CODE_PROPERTIES
 			: ERROR_MESSAGE_PROPERTIES;
 		const nestedKeys = ERROR_NESTED_PROPERTIES;
@@ -39,8 +48,7 @@ abstract class NodeError extends Error {
 
 		for (const key of nestedKeys) {
 			const value = error[key];
-			if (isJsonObject(value)) return this.findProperty(value, { target });
-			// if (isJsonArray(value)) return ???
+			if (isJsonObject(value)) return this.findValueRecursively(value, { targetProperty });
 		}
 
 		return null;
@@ -63,30 +71,28 @@ export class NodeApiError extends NodeError {
 	constructor(
 		nodeType: string,
 		error: JsonObject,
-		customArgs: NodeApiErrorCustomArgs = {},
+		{ customDetails, descriptionIsArray }: NodeApiErrorConstructorArgs = {},
 	) {
-		super('NodeApiError', nodeType, error);
+		super('NodeApiError', nodeType, error, descriptionIsArray);
 		this.message = `${nodeType}: `;
 
-		isEmpty(customArgs)
+		isEmpty(customDetails)
 			? this.setFieldsFromError(error)
-			: this.setFieldsFromCustomArgs(customArgs);
+			: this.setFieldsFromCustomDetails(customDetails);
 	}
 
-	private setFieldsFromCustomArgs(
-		{ customHttpCode, customMessage, customHeader }: NodeApiErrorCustomArgs) {
-		if (customHttpCode) this.httpCode = customHttpCode;
-		if (customMessage) this.message += customMessage;
-		if (customHeader) {
-			this.traceHeader = this.httpCode
-				? `${this.httpCode} - ${customHeader}`
-				: customHeader;
+	private setFieldsFromCustomDetails(
+		{ httpCode, message, description }: CustomDetails = {}) {
+		if (httpCode) this.httpCode = httpCode;
+		if (message) this.message += message;
+		if (description) {
+			this.description = this.httpCode ? `${this.httpCode} - ${description}` : description;
 		}
 	}
 
 	private setFieldsFromError(error: JsonObject) {
-		this.httpCode = this.findProperty(error, { target: 'httpCode' });
-		this.traceHeader = this.findProperty(error, { target: 'traceHeader' });
+		this.httpCode = this.findValueRecursively(error, { targetProperty: 'httpCode' });
+		this.description = this.findValueRecursively(error, { targetProperty: 'description' });
 		this.message = this.findMessage();
 	}
 
@@ -106,11 +112,16 @@ export class NodeApiError extends NodeError {
 
 // -------------------------- typings -------------------------- //
 
-type NodeApiErrorCustomArgs = {
-	customMessage?: string,
-	customHeader?: string,
-	customHttpCode?: string,
+type NodeApiErrorConstructorArgs = {
+	customDetails?: {
+		description?: string,
+		httpCode?: string,
+		message?: string,
+	},
+	descriptionIsArray?: boolean,
 };
+
+type CustomDetails = NodeApiErrorConstructorArgs['customDetails'];
 
 type JsonObject = { [key: string]: JsonValue };
 
@@ -122,13 +133,19 @@ type JsonValue =
 	| JsonValue[]
 	| JsonObject;
 
+type ErrorObjectsContainer = {
+		response: {
+			body: {
+				error: {
+					errors: Array<{ message: string }>;
+				}
+			}
+		}
+};
+
 function isJsonObject(value: unknown): value is JsonObject {
 	return typeof value === 'object' && typeof value !== null && !Array.isArray(value);
 }
-
-// function isJsonArray(value: unknown): value is JsonArray {
-// 	return Array.isArray(value);
-// }
 
 // -------------------------- constants -------------------------- //
 
