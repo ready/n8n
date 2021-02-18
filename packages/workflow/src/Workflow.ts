@@ -166,7 +166,7 @@ export class Workflow {
 				continue;
 			}
 
-			nodeType = this.nodeTypes.getByName(node.type);
+			nodeType = this.nodeTypes.getByNameAndVersion(node.type, node.typeVersion);
 
 			if (nodeType === undefined) {
 				// Type is not known so check is not possible
@@ -208,7 +208,7 @@ export class Workflow {
 				continue;
 			}
 
-			nodeType = this.nodeTypes.getByName(node.type);
+			nodeType = this.nodeTypes.getByNameAndVersion(node.type, node.typeVersion);
 
 			if (nodeType === undefined) {
 				// Node type is not known
@@ -311,7 +311,7 @@ export class Workflow {
 				continue;
 			}
 
-			nodeType = this.nodeTypes.getByName(node.type);
+			nodeType = this.nodeTypes.getByNameAndVersion(node.type, node.typeVersion);
 
 			if (nodeType !== undefined && checkFunction(nodeType)) {
 				returnNodes.push(node);
@@ -700,7 +700,7 @@ export class Workflow {
 		let nodeType: INodeType;
 		for (const nodeName of nodeNames) {
 			node = this.nodes[nodeName];
-			nodeType = this.nodeTypes.getByName(node.type) as INodeType;
+			nodeType = this.nodeTypes.getByNameAndVersion(node.type, node.typeVersion) as INodeType;
 
 
 			if (nodeType.trigger !== undefined || nodeType.poll !== undefined) {
@@ -772,7 +772,7 @@ export class Workflow {
 	 */
 	async runWebhookMethod(method: WebhookSetupMethodNames, webhookData: IWebhookData, nodeExecuteFunctions: INodeExecuteFunctions, mode: WorkflowExecuteMode, isTest?: boolean): Promise<boolean | undefined> {
 		const node = this.getNode(webhookData.node) as INode;
-		const nodeType = this.nodeTypes.getByName(node.type) as INodeType;
+		const nodeType = this.nodeTypes.getByNameAndVersion(node.type, node.typeVersion) as INodeType;
 
 
 		if (nodeType.webhookMethods === undefined) {
@@ -806,7 +806,7 @@ export class Workflow {
 	async runTrigger(node: INode, getTriggerFunctions: IGetExecuteTriggerFunctions, additionalData: IWorkflowExecuteAdditionalData, mode: WorkflowExecuteMode): Promise<ITriggerResponse | undefined> {
 		const triggerFunctions = getTriggerFunctions(this, node, additionalData, mode);
 
-		const nodeType = this.nodeTypes.getByName(node.type);
+		const nodeType = this.nodeTypes.getByNameAndVersion(node.type, node.typeVersion);
 
 		if (nodeType === undefined) {
 			throw new Error(`The node type "${node.type}" of node "${node.name}" is not known.`);
@@ -846,7 +846,7 @@ export class Workflow {
 	 * @memberof Workflow
 	 */
 	async runPoll(node: INode, pollFunctions: IPollFunctions): Promise<INodeExecutionData[][] | null> {
-		const nodeType = this.nodeTypes.getByName(node.type);
+		const nodeType = this.nodeTypes.getByNameAndVersion(node.type, node.typeVersion);
 
 		if (nodeType === undefined) {
 			throw new Error(`The node type "${node.type}" of node "${node.name}" is not known.`);
@@ -872,7 +872,7 @@ export class Workflow {
 	 * @memberof Workflow
 	 */
 	async runWebhook(webhookData: IWebhookData, node: INode, additionalData: IWorkflowExecuteAdditionalData, nodeExecuteFunctions: INodeExecuteFunctions, mode: WorkflowExecuteMode): Promise<IWebhookResponseData> {
-		const nodeType = this.nodeTypes.getByName(node.type);
+		const nodeType = this.nodeTypes.getByNameAndVersion(node.type, node.typeVersion);
 		if (nodeType === undefined) {
 			throw new Error(`The type of the webhook node "${node.name}" is not known.`);
 		} else if (nodeType.webhook === undefined) {
