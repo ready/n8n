@@ -515,7 +515,7 @@ export default mixins(
 	border: none;
 	z-index: 200;
 	font-size: 0.8em;
-	color: #555;
+	color: #dbdff1;
 	border-radius: 2px 0 0 2px;
 
 	textarea {

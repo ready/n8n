@@ -24,7 +24,7 @@ export class Ready implements INodeType {
 		description: 'Makes a GraphQL request to Ready API and returns the received data',
 		defaults: {
 			name: 'Ready',
-			color: '#E10098',
+			color: '#F5F6FB',
 		},
 		inputs: ['main'],
 		outputs: ['main'],

@@ -9,17 +9,7 @@
 		<input type="file" ref="importFile" style="display: none" v-on:change="handleFileImport()">
 
 		<div class="side-menu-wrapper" :class="{expanded: !isCollapsed}">
-			<div id="collapse-change-button" class="clickable" @click="isCollapsed=!isCollapsed">
-				<font-awesome-icon icon="angle-right" class="icon" />
-			</div>
 			<el-menu default-active="workflow" @select="handleSelect" :collapse="isCollapsed">
-
-				<el-menu-item index="logo" class="logo-item">
-					<a href="https://n8n.io" target="_blank" class="logo">
-						<img :src="basePath + 'n8n-icon-small.png'" class="icon" alt="n8n.io"/>
-						<span class="logo-text" slot="title">n8n.io</span>
-					</a>
-				</el-menu-item>
 
 				<el-submenu index="workflow" title="Workflow">
 					<template slot="title">

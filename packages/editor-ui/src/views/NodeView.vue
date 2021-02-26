@@ -2098,7 +2098,13 @@ export default mixins(
 	line-height: 25px;
 	z-index: 18;
 	color: #444;
+	background: transparent;
 	padding-right: 5px;
+
+	button {
+		background: transparent;
+		color: $--color-primary;
+	}
 }
 
 .node-creator-button {
@@ -2111,9 +2117,9 @@ export default mixins(
 
 .node-creator-button button {
 	position: relative;
-	background: $--color-primary;
+	background: #dbdff1;
 	font-size: 1.4em;
-	color: #fff;
+	color: #8676FF;
 }
 
 .node-creator-button:hover button {
@@ -2148,7 +2154,7 @@ export default mixins(
 	top: -5000px;
 	left: -5000px;
 	background-size: 50px 50px;
-	background-image: linear-gradient(to right, #eeeefe 1px, transparent 1px), linear-gradient(to bottom, #eeeefe 1px, transparent 1px);
+	background-image: linear-gradient(to right, #dbdff1 1px, transparent 1px), linear-gradient(to bottom, #dbdff1 1px, transparent 1px);
 }
 
 .move-active {
@@ -2179,13 +2185,24 @@ export default mixins(
 		margin-right: 0.5em;
 	}
 
+	.clear-execution {
+		color: #8676FF;
+		background-color: #f8f8f8;
+		border-style: solid;
+		border-color: #8676FF;
+	}
+
 	.workflow-run-button {
 		padding: 12px;
+		color: #8676FF;
+		background-color: #f8f8f8;
+		border-style: solid;
+		border-color: #8676FF;
 	}
 
 	.stop-execution,
 	.workflow-run-button.running {
-		color: $--color-primary;
+		color: #8676FF;
 		background-color: $--color-primary-light;
 	}
 }
